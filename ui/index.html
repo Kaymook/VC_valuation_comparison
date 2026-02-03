@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VC Valuation Comparison Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      }
+      body {
+        margin: 0;
+        background: #f6f7fb;
+        color: #1f2a44;
+      }
+      header {
+        background: #1f2a44;
+        color: #fff;
+        padding: 24px 32px;
+      }
+      header h1 {
+        margin: 0 0 8px;
+        font-size: 24px;
+      }
+      header p {
+        margin: 0;
+        opacity: 0.85;
+      }
+      main {
+        padding: 24px 32px 48px;
+        display: grid;
+        gap: 24px;
+      }
+      .card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 12px 30px rgba(31, 42, 68, 0.08);
+        padding: 20px 24px;
+      }
+      .filters {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      select {
+        width: 100%;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #c7d0e2;
+        background: #fff;
+      }
+      .sources {
+        display: grid;
+        gap: 12px;
+      }
+      .source-item {
+        background: #f2f5ff;
+        border-radius: 10px;
+        padding: 12px 14px;
+      }
+      .source-item a {
+        color: #1a62d7;
+        text-decoration: none;
+      }
+      .grid-two {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #e6ebf5;
+        text-align: left;
+        font-size: 14px;
+      }
+      th {
+        background: #f7f9ff;
+        font-weight: 600;
+      }
+      .metric-unit {
+        color: #5b6b8c;
+        font-weight: 400;
+        margin-left: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>VC Valuation Comparison Dashboard</h1>
+      <p>IPO前後の主要指標（売上・利益・時価総額・TAM/SAM/SOM）を企業横断で比較。</p>
+    </header>
+    <main>
+      <section class="card filters">
+        <div>
+          <label for="companySelect">企業</label>
+          <select id="companySelect" multiple size="4"></select>
+        </div>
+        <div>
+          <label for="metricSelect">比較指標</label>
+          <select id="metricSelect"></select>
+        </div>
+        <div>
+          <label for="periodSelect">期間軸 (IPO=0)</label>
+          <select id="periodSelect" multiple size="4"></select>
+        </div>
+      </section>
+
+      <section class="card grid-two">
+        <div>
+          <h2>比較グラフ</h2>
+          <canvas id="comparisonChart" height="180"></canvas>
+        </div>
+        <div>
+          <h2>情報ソース</h2>
+          <div id="sourceList" class="sources"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>指標テーブル</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>企業</th>
+              <th>IPO年</th>
+              <th>期間</th>
+              <th>指標値</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script>
+      let metrics = [];
+
+      const companySelect = document.getElementById("companySelect");
+      const metricSelect = document.getElementById("metricSelect");
+      const periodSelect = document.getElementById("periodSelect");
+      const tableBody = document.getElementById("tableBody");
+      const sourceList = document.getElementById("sourceList");
+
+      let comparisonChart;
+      let rawData = [];
+      let periodAxis = [];
+
+      const formatValue = (value, unit) =>
+        value === null || value === undefined ? "-" : `${value.toLocaleString()} ${unit}`;
+
+      const unique = (values) => Array.from(new Set(values));
+
+      const buildSelectOptions = (select, options) => {
+        select.innerHTML = "";
+        options.forEach((option) => {
+          const opt = document.createElement("option");
+          opt.value = option.value;
+          opt.textContent = option.label;
+          opt.selected = option.selected || false;
+          select.appendChild(opt);
+        });
+      };
+
+      const updateSources = (filtered) => {
+        const companyMap = new Map();
+        filtered.forEach((row) => {
+          if (!companyMap.has(row.company_id)) {
+            companyMap.set(row.company_id, row);
+          }
+        });
+
+        sourceList.innerHTML = "";
+        companyMap.forEach((row) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "source-item";
+          const title = document.createElement("strong");
+          title.textContent = row.company_name;
+          wrapper.appendChild(title);
+
+          row.sources.forEach((source) => {
+            const link = document.createElement("div");
+            const anchor = document.createElement("a");
+            anchor.href = source.url;
+            anchor.textContent = source.label;
+            anchor.target = "_blank";
+            link.appendChild(anchor);
+            wrapper.appendChild(link);
+          });
+
+          sourceList.appendChild(wrapper);
+        });
+      };
+
+      const updateTable = (filtered, metric) => {
+        tableBody.innerHTML = "";
+        filtered.forEach((row) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.company_name}</td>
+            <td>${row.ipo_year}</td>
+            <td>${row.period}</td>
+            <td>${formatValue(row[metric.key], metric.unit)}</td>
+          `;
+          tableBody.appendChild(tr);
+        });
+      };
+
+      const updateChart = (filtered, metric) => {
+        const grouped = {};
+        filtered.forEach((row) => {
+          if (!grouped[row.company_name]) {
+            grouped[row.company_name] = [];
+          }
+          grouped[row.company_name].push({
+            period: row.period,
+            value: row[metric.key]
+          });
+        });
+
+        const datasets = Object.entries(grouped).map(([company, points], index) => {
+          const sorted = points.sort((a, b) => a.period - b.period);
+          return {
+            label: company,
+            data: sorted.map((point) => ({ x: point.period, y: point.value })),
+            borderColor: ["#4c6fff", "#ff8c42", "#2bb673"][index % 3],
+            backgroundColor: "transparent",
+            tension: 0.2
+          };
+        });
+
+        if (comparisonChart) {
+          comparisonChart.destroy();
+        }
+
+        comparisonChart = new Chart(document.getElementById("comparisonChart"), {
+          type: "line",
+          data: { datasets },
+          options: {
+            responsive: true,
+            scales: {
+              x: {
+                type: "linear",
+                title: {
+                  display: true,
+                  text: "IPO基準の年"
+                },
+                ticks: {
+                  callback: (value) =>
+                    periodAxis.length === 0 || periodAxis.includes(value) ? value : ""
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: `${metric.label} (${metric.unit})`
+                }
+              }
+            },
+            plugins: {
+              legend: { position: "bottom" },
+              tooltip: {
+                callbacks: {
+                  label: (context) =>
+                    `${context.dataset.label}: ${formatValue(context.raw.y, metric.unit)}`
+                }
+              }
+            }
+          }
+        });
+      };
+
+      const filterData = () => {
+        const selectedCompanies = Array.from(companySelect.selectedOptions).map(
+          (option) => option.value
+        );
+        const selectedPeriods = Array.from(periodSelect.selectedOptions).map((option) =>
+          Number(option.value)
+        );
+        const metric = metrics.find((item) => item.key === metricSelect.value);
+
+        const filtered = rawData.filter((row) => {
+          const companyMatch =
+            selectedCompanies.length === 0 || selectedCompanies.includes(row.company_id);
+          const periodMatch =
+            selectedPeriods.length === 0 || selectedPeriods.includes(row.period);
+          return companyMatch && periodMatch;
+        });
+
+        updateSources(filtered);
+        updateTable(filtered, metric);
+        updateChart(filtered, metric);
+      };
+
+      const init = async () => {
+        const [dataResponse, metadataResponse] = await Promise.all([
+          fetch("./data/comparison_table.json"),
+          fetch("./data/metadata.json")
+        ]);
+        rawData = await dataResponse.json();
+        const metadata = await metadataResponse.json();
+        metrics = metadata.metrics;
+        periodAxis = metadata.period_axis;
+
+        const companyOptions = unique(
+          rawData.map((row) => JSON.stringify({
+            company_id: row.company_id,
+            company_name: row.company_name
+          }))
+        ).map((value, index) => {
+          const company = JSON.parse(value);
+          return {
+            value: company.company_id,
+            label: company.company_name,
+            selected: index < 2
+          };
+        });
+
+        const periodOptions = periodAxis.map((period, index) => ({
+          value: period,
+          label: period,
+          selected: index < 4
+        }));
+
+        const metricOptions = metrics.map((metric, index) => ({
+          value: metric.key,
+          label: `${metric.label} (${metric.unit})`,
+          selected: index === 0
+        }));
+
+        buildSelectOptions(companySelect, companyOptions);
+        buildSelectOptions(periodSelect, periodOptions);
+        buildSelectOptions(metricSelect, metricOptions);
+
+        companySelect.addEventListener("change", filterData);
+        periodSelect.addEventListener("change", filterData);
+        metricSelect.addEventListener("change", filterData);
+
+        filterData();
+      };
+
+      init();
+    </script>
+  </body>
+</html>
