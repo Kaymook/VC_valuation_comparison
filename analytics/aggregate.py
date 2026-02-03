@@ -14,6 +14,11 @@ DATA_PATH = ROOT / "data" / "company_timeseries.json"
 OUTPUT_DIR = ROOT / "output"
 OUTPUT_JSON = OUTPUT_DIR / "comparison_table.json"
 OUTPUT_CSV = OUTPUT_DIR / "comparison_table.csv"
+REPO_ROOT = ROOT.parent
+UI_DATA_DIR = REPO_ROOT / "ui" / "data"
+UI_OUTPUT_JSON = UI_DATA_DIR / "comparison_table.json"
+OUTPUT_METADATA = OUTPUT_DIR / "metadata.json"
+UI_METADATA = UI_DATA_DIR / "metadata.json"
 
 
 def load_company_data(path: Path = DATA_PATH) -> Dict:
@@ -71,11 +76,32 @@ def write_csv(rows: Iterable[Dict[str, object]], path: Path = OUTPUT_CSV) -> Non
             writer.writerow(row_copy)
 
 
+def write_metadata(path: Path) -> None:
+    payload = {
+        "metrics": [
+            {
+                "key": metric.key,
+                "label": metric.label,
+                "unit": metric.unit,
+                "description": metric.description,
+            }
+            for metric in METRICS
+        ],
+        "period_axis": PERIOD_AXIS,
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as file_handle:
+        json.dump(payload, file_handle, ensure_ascii=False, indent=2)
+
+
 def main() -> None:
     data = load_company_data()
     rows = build_rows(data)
     write_json(rows)
+    write_json(rows, path=UI_OUTPUT_JSON)
     write_csv(rows)
+    write_metadata(OUTPUT_METADATA)
+    write_metadata(UI_METADATA)
 
 
 if __name__ == "__main__":

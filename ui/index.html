@@ -145,15 +145,7 @@
     </main>
 
     <script>
-      const metrics = [
-        { key: "revenue", label: "売上", unit: "億円" },
-        { key: "net_income", label: "純利益", unit: "億円" },
-        { key: "operating_income", label: "営業利益", unit: "億円" },
-        { key: "market_cap", label: "時価総額", unit: "億円" },
-        { key: "tam", label: "TAM", unit: "億円" },
-        { key: "sam", label: "SAM", unit: "億円" },
-        { key: "som", label: "SOM", unit: "億円" }
-      ];
+      let metrics = [];
 
       const companySelect = document.getElementById("companySelect");
       const metricSelect = document.getElementById("metricSelect");
@@ -163,6 +155,7 @@
 
       let comparisonChart;
       let rawData = [];
+      let periodAxis = [];
 
       const formatValue = (value, unit) =>
         value === null || value === undefined ? "-" : `${value.toLocaleString()} ${unit}`;
@@ -262,6 +255,10 @@
                 title: {
                   display: true,
                   text: "IPO基準の年"
+                },
+                ticks: {
+                  callback: (value) =>
+                    periodAxis.length === 0 || periodAxis.includes(value) ? value : ""
                 }
               },
               y: {
@@ -307,8 +304,14 @@
       };
 
       const init = async () => {
-        const response = await fetch("./data/comparison_table.json");
-        rawData = await response.json();
+        const [dataResponse, metadataResponse] = await Promise.all([
+          fetch("./data/comparison_table.json"),
+          fetch("./data/metadata.json")
+        ]);
+        rawData = await dataResponse.json();
+        const metadata = await metadataResponse.json();
+        metrics = metadata.metrics;
+        periodAxis = metadata.period_axis;
 
         const companyOptions = unique(
           rawData.map((row) => JSON.stringify({
@@ -324,13 +327,11 @@
           };
         });
 
-        const periodOptions = unique(rawData.map((row) => row.period))
-          .sort((a, b) => a - b)
-          .map((period, index) => ({
-            value: period,
-            label: period,
-            selected: index < 4
-          }));
+        const periodOptions = periodAxis.map((period, index) => ({
+          value: period,
+          label: period,
+          selected: index < 4
+        }));
 
         const metricOptions = metrics.map((metric, index) => ({
           value: metric.key,
