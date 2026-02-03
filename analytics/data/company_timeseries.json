@@ -1,0 +1,146 @@
+{
+  "companies": [
+    {
+      "company_id": "alpha-tech",
+      "company_name": "Alpha Tech",
+      "ipo_year": 2022,
+      "sources": [
+        {
+          "label": "有価証券報告書",
+          "url": "https://example.com/alpha/annual-report"
+        },
+        {
+          "label": "適時開示",
+          "url": "https://example.com/alpha/tdnet"
+        }
+      ],
+      "time_series": {
+        "-3": {
+          "revenue": 120,
+          "net_income": -15,
+          "operating_income": -10,
+          "market_cap": 300,
+          "tam": 1800,
+          "sam": 800,
+          "som": 200
+        },
+        "-2": {
+          "revenue": 160,
+          "net_income": -8,
+          "operating_income": -4,
+          "market_cap": 420,
+          "tam": 1900,
+          "sam": 850,
+          "som": 230
+        },
+        "-1": {
+          "revenue": 210,
+          "net_income": 5,
+          "operating_income": 12,
+          "market_cap": 650,
+          "tam": 2100,
+          "sam": 900,
+          "som": 260
+        },
+        "0": {
+          "revenue": 280,
+          "net_income": 18,
+          "operating_income": 22,
+          "market_cap": 1200,
+          "tam": 2300,
+          "sam": 1000,
+          "som": 320
+        },
+        "1": {
+          "revenue": 360,
+          "net_income": 30,
+          "operating_income": 45,
+          "market_cap": 1450,
+          "tam": 2500,
+          "sam": 1120,
+          "som": 380
+        },
+        "2": {
+          "revenue": 450,
+          "net_income": 42,
+          "operating_income": 60,
+          "market_cap": 1700,
+          "tam": 2700,
+          "sam": 1250,
+          "som": 450
+        }
+      }
+    },
+    {
+      "company_id": "bravo-cloud",
+      "company_name": "Bravo Cloud",
+      "ipo_year": 2021,
+      "sources": [
+        {
+          "label": "有価証券報告書",
+          "url": "https://example.com/bravo/annual-report"
+        },
+        {
+          "label": "適時開示",
+          "url": "https://example.com/bravo/tdnet"
+        }
+      ],
+      "time_series": {
+        "-3": {
+          "revenue": 90,
+          "net_income": -25,
+          "operating_income": -18,
+          "market_cap": 260,
+          "tam": 1500,
+          "sam": 650,
+          "som": 170
+        },
+        "-2": {
+          "revenue": 130,
+          "net_income": -14,
+          "operating_income": -8,
+          "market_cap": 340,
+          "tam": 1600,
+          "sam": 700,
+          "som": 190
+        },
+        "-1": {
+          "revenue": 170,
+          "net_income": -2,
+          "operating_income": 4,
+          "market_cap": 520,
+          "tam": 1750,
+          "sam": 760,
+          "som": 220
+        },
+        "0": {
+          "revenue": 230,
+          "net_income": 12,
+          "operating_income": 18,
+          "market_cap": 980,
+          "tam": 1900,
+          "sam": 840,
+          "som": 260
+        },
+        "1": {
+          "revenue": 300,
+          "net_income": 22,
+          "operating_income": 30,
+          "market_cap": 1100,
+          "tam": 2100,
+          "sam": 930,
+          "som": 310
+        },
+        "2": {
+          "revenue": 370,
+          "net_income": 28,
+          "operating_income": 38,
+          "market_cap": 1280,
+          "tam": 2300,
+          "sam": 1020,
+          "som": 360
+        }
+      }
+    }
+  ]
+}
