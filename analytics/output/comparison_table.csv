@@ -1,0 +1,13 @@
+company_id,company_name,ipo_year,period,revenue,net_income,operating_income,market_cap,tam,sam,som,sources
+alpha-tech,Alpha Tech,2022,-3,120,-15,-10,300,1800,800,200,"[{""label"": ""有価証券報告書"", ""url"": ""https://example.com/alpha/annual-report""}, {""label"": ""適時開示"", ""url"": ""https://example.com/alpha/tdnet""}]"
+alpha-tech,Alpha Tech,2022,-2,160,-8,-4,420,1900,850,230,"[{""label"": ""有価証券報告書"", ""url"": ""https://example.com/alpha/annual-report""}, {""label"": ""適時開示"", ""url"": ""https://example.com/alpha/tdnet""}]"
+alpha-tech,Alpha Tech,2022,-1,210,5,12,650,2100,900,260,"[{""label"": ""有価証券報告書"", ""url"": ""https://example.com/alpha/annual-report""}, {""label"": ""適時開示"", ""url"": ""https://example.com/alpha/tdnet""}]"
+alpha-tech,Alpha Tech,2022,0,280,18,22,1200,2300,1000,320,"[{""label"": ""有価証券報告書"", ""url"": ""https://example.com/alpha/annual-report""}, {""label"": ""適時開示"", ""url"": ""https://example.com/alpha/tdnet""}]"
+alpha-tech,Alpha Tech,2022,1,360,30,45,1450,2500,1120,380,"[{""label"": ""有価証券報告書"", ""url"": ""https://example.com/alpha/annual-report""}, {""label"": ""適時開示"", ""url"": ""https://example.com/alpha/tdnet""}]"
+alpha-tech,Alpha Tech,2022,2,450,42,60,1700,2700,1250,450,"[{""label"": ""有価証券報告書"", ""url"": ""https://example.com/alpha/annual-report""}, {""label"": ""適時開示"", ""url"": ""https://example.com/alpha/tdnet""}]"
+bravo-cloud,Bravo Cloud,2021,-3,90,-25,-18,260,1500,650,170,"[{""label"": ""有価証券報告書"", ""url"": ""https://example.com/bravo/annual-report""}, {""label"": ""適時開示"", ""url"": ""https://example.com/bravo/tdnet""}]"
+bravo-cloud,Bravo Cloud,2021,-2,130,-14,-8,340,1600,700,190,"[{""label"": ""有価証券報告書"", ""url"": ""https://example.com/bravo/annual-report""}, {""label"": ""適時開示"", ""url"": ""https://example.com/bravo/tdnet""}]"
+bravo-cloud,Bravo Cloud,2021,-1,170,-2,4,520,1750,760,220,"[{""label"": ""有価証券報告書"", ""url"": ""https://example.com/bravo/annual-report""}, {""label"": ""適時開示"", ""url"": ""https://example.com/bravo/tdnet""}]"
+bravo-cloud,Bravo Cloud,2021,0,230,12,18,980,1900,840,260,"[{""label"": ""有価証券報告書"", ""url"": ""https://example.com/bravo/annual-report""}, {""label"": ""適時開示"", ""url"": ""https://example.com/bravo/tdnet""}]"
+bravo-cloud,Bravo Cloud,2021,1,300,22,30,1100,2100,930,310,"[{""label"": ""有価証券報告書"", ""url"": ""https://example.com/bravo/annual-report""}, {""label"": ""適時開示"", ""url"": ""https://example.com/bravo/tdnet""}]"
+bravo-cloud,Bravo Cloud,2021,2,370,28,38,1280,2300,1020,360,"[{""label"": ""有価証券報告書"", ""url"": ""https://example.com/bravo/annual-report""}, {""label"": ""適時開示"", ""url"": ""https://example.com/bravo/tdnet""}]"
