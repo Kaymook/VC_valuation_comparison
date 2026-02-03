@@ -1,31 +1,34 @@
 # VC_valuation_comparison
 
-VC投資の比較分析のために、IPO前後の主要指標を時系列で揃え、企業間比較を可視化するための最小構成です。
+This repository provides a lightweight matching pipeline for comparing venture-backed companies by category, business model, and textual similarity.
 
-## 定義済みの指標と期間軸
+## Category taxonomy
+- Industry codes follow a simplified Japan Industry Classification-inspired scheme with custom tags.
+- Business model categories cover SaaS, marketplace, transaction, ads, and hardware.
 
-- 指標: 売上、純利益、営業利益、時価総額、TAM/SAM/SOM
-- 期間軸: IPO年を0として、IPO前3年〜IPO後2年（`-3`〜`2`）をデフォルトで定義
+## Matching pipeline
+The pipeline supports:
+1. Attribute ingestion (`InputProfile`)
+2. Candidate extraction (industry or tag overlap)
+3. Scoring (rule-based + embedding-based)
+4. Explainable score breakdown metadata
 
-指標定義は `analytics/metrics.py` に集約しています。
+## Quick start
+```python
+from matching.models import InputProfile
+from matching.pipeline import build_sample_candidates, run_matching_pipeline
 
-## 使い方
+profile = InputProfile(
+    industry_code="I101",
+    tags=["SaaS", "クラウド"],
+    business_models=["SaaS"],
+    markets=["日本"],
+    customer_types=["SMB"],
+    description="クラウド運用の自動化を支援するB2B SaaS",
+)
 
-1. 集計データの生成
-
-```bash
-python analytics/aggregate.py
+companies = build_sample_candidates()
+results = run_matching_pipeline(profile, companies)
+for result in results:
+    print(result.company.name, result.breakdown.total_score, result.breakdown.matched_tags)
 ```
-
-2. 比較ビューの表示
-
-```bash
-python -m http.server 8000 --directory ui
-```
-
-ブラウザで `http://localhost:8000` を開くと、グラフ・テーブル・フィルタ付きの比較ビューが表示されます。
-
-## ディレクトリ構成
-
-- `analytics/` : 指標定義と集計ロジック（CSV/JSON出力）
-- `ui/` : ダッシュボードUI（グラフ/テーブル/フィルタ/情報ソース）
